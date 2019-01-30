@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <li v-for="(log, index) in logs" :key="index">[{{log.now}}]&nbsp;&nbsp;<span :class="{error: log.isError}">{{log.text}}</span></li>
+    <li v-for="(log, index) in logs" :key="index">[{{log.now}}]&nbsp;&nbsp;{{log.isError ? '❌ ' : ''}}<span :class="{error: log.isError}">{{log.text}}</span></li>
   </ul>
 </template>
 

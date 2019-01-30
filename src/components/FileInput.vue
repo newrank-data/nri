@@ -1,10 +1,10 @@
 <template>
   <div class="flex-row flex-between">
     <div>
-      <label for="file">选择数据表</label>
-      <input type="file" id="file" name="file" accept=".xlsx, xls" @change="handleChange"><span :class="{hidden: isFileNull}">&nbsp;&nbsp;{{fileName}}&nbsp;({{fileSize}})</span>
+      <label for="file">选择文件</label>
+      <input type="file" id="file" name="file" accept=".xlsx, xls" @change="handleChange"><span :class="{hidden: disabled}">&nbsp;&nbsp;{{fileName}}&nbsp;({{fileSize}})</span>
     </div>
-    <button :disabled="isFileNull" @click="handleClick">解析数据</button>
+    <button :disabled="disabled" @click="handleClick">解析文件</button>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
   data () {
     return {
       file: null,
-      isFileNull: true
+      disabled: true
     }
   },
   computed: {
@@ -29,7 +29,7 @@ export default {
   methods: {
     handleChange ($event) {
       this.file = $event.target.files[0];
-      this.isFileNull = false;
+      this.disabled = this.file ? false : true;
     },
     handleClick () {
       this.$emit('parse', this.file);
@@ -40,9 +40,6 @@ export default {
 
 <style scoped>
 input {
-  display: none;
-}
-.hidden {
   display: none;
 }
 span {

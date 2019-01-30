@@ -1,17 +1,6 @@
-公众号回采/文章搜索
-Sheet1/list
-  - 公众号昵称
-  - 微信号
-  - 发布位置
-  - 阅读数
-  - 点赞数
-  - 发布时间
-
-自助工具
-sheet1
-  - name
-  - account
-  - orderNum
-  - clicksCount
-  - likeCount
-  - publicTime
+# 新榜指数计算器
+**使用说明**
+1. 支持同时计算相同时间周期内多个公众号的新榜指数，合并在一个文件即可
+2. 文件中除第一张表以外的其他表<strong>必须删除</strong>
+3. 点击<strong>选择文件</strong>选中已删除多余表的数据文件，点击<strong>解析文件</strong>
+4. 解析完成后，确认计算的时间周期是否正确，不准确可以手动修改，然后点击<strong>计算指数</strong>
