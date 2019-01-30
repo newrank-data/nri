@@ -4,10 +4,11 @@
       <div style="width: 1024px; margin-top: 40px;">
         <h2>使用说明：</h2>
         <ol>
+          <li>支持从<strong>公众号回采</strong>、<strong>文章搜索</strong>和<strong>数据自助工具</strong>下载的数据文件</li>
           <li>支持同时计算相同时间周期内多个公众号的新榜指数，合并在一个文件即可</li>
           <li>文件中除第一张表以外的其他表<strong class="error">必须删除</strong></li>
           <li>点击<strong>选择文件</strong>选中已删除多余表的数据文件，点击<strong>解析文件</strong></li>
-          <li>解析完成后，确认计算的时间周期是否正确，不准确可以手动修改，然后点击<strong>计算指数</strong></li>
+          <li>解析完成后，确认计算的时间周期是否准确，可以手动修改，然后点击<strong>计算指数</strong></li>
         </ol>
         <hr>
         <div style="margin-top: 40px;">
@@ -129,7 +130,7 @@ export default {
       this.startDate = new Date(dates.sort()[0]).toLocaleDateString();
       this.endDate = new Date(dates.sort()[dates.length - 1]).toLocaleDateString();
       this.statistics =  this.assembleData(rows);
-      this.pushLog('数据提取成功，请确认下方的开始日期和结束日期是否正确，不正确可以手动修改');
+      this.pushLog('数据提取成功，请确认下方的开始日期和结束日期是否准确，不准确可以手动修改');
       this.disableCalculate = false;
     },
     changeStartDate (value) {
@@ -143,7 +144,7 @@ export default {
       const endDate = new Date(end);
       
       if (startDate == 'Invalid Date' || endDate == 'Invalid Date' ) {
-        this.pushLog('输入的日期格式不正确，请按照“年/月/日”输入，如 2019/1/1', true);
+        this.pushLog('输入的日期格式不准确，请按照“年/月/日”输入，如 2019/1/1', true);
         return false;
       } else if (startDate > endDate) {
         this.pushLog('开始日期不能大于结束日期', true);
