@@ -43,6 +43,6 @@ input {
   display: none;
 }
 span {
-  font-size: 0.6em;
+  font-size: 0.8em;
 }
 </style>

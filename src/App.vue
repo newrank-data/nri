@@ -127,8 +127,8 @@ export default {
       
       const rows = XLSX.utils.sheet_to_json(firstSheet, options);
       const dates = rows.map(row => Date.parse(row.publicTime));
-      this.startDate = new Date(dates.sort()[0]).toLocaleDateString();
-      this.endDate = new Date(dates.sort()[dates.length - 1]).toLocaleDateString();
+      this.startDate = new Date(dates.sort()[0]).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'});
+      this.endDate = new Date(dates.sort()[dates.length - 1]).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'});
       this.statistics =  this.assembleData(rows);
       this.pushLog('数据提取成功，请确认下方的开始日期和结束日期是否准确，不准确可以手动修改');
       this.disableCalculate = false;
@@ -176,8 +176,8 @@ export default {
           const rHI = Math.log(gh.readSumOfHeadline + 1) / Math.log(rH + 1) * 1000;
           const lSI = Math.log(gh.likeSum + 1) / Math.log(lS + 1) * 1000;
 
-          // 加权后相加，保留两位小数
-          const nri = (0.75 * rSI + 0.05 * rMI + 0.1 * rAI + 0.05 * rHI + 0.05 * lSI).toFixed(2);
+          // 加权后相加，保留 1 位小数
+          const nri = (0.75 * rSI + 0.05 * rMI + 0.1 * rAI + 0.05 * rHI + 0.05 * lSI).toFixed(1);
           return {
             account: gh.account,
             name: gh.name,
