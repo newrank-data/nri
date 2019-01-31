@@ -6,7 +6,7 @@
         <ol>
           <li>支持从<strong>公众号回采</strong>、<strong>文章搜索</strong>和<strong>数据自助工具</strong>下载的数据文件</li>
           <li>支持同时计算相同时间周期内多个公众号的新榜指数，合并在一个文件即可</li>
-          <li>文件中除第一张表以外的其他表<strong class="error">必须删除</strong></li>
+          <li>文件中除第一张表以外的其他表<strong class="error">必须删除</strong>，第一张表的表名和字段<strong class="error">不要修改</strong></li>
           <li>点击<strong>选择文件</strong>选中已删除多余表的数据文件，点击<strong>解析文件</strong></li>
           <li>解析完成后，确认计算的时间周期是否准确，可以手动修改，然后点击<strong>计算指数</strong></li>
         </ol>
@@ -114,21 +114,35 @@ export default {
 
       const firstSheet = wb.Sheets[firstSheetName];
       const options = {raw: false};
-      const lastColNum = /:([A-Z]+)/.exec(firstSheet['!ref'])[1];
 
+      // 根据最后一个字段判断属于哪种数据来源，然后定义不同 header 进行解析实现字段名统一
+      // AG = 新版公众号回采
+      // AE = 旧版公众号回采
+      // AB = 文章搜索
+      // Y =  数据自助工具
+      const lastColNum = /:([A-Z]+)/.exec(firstSheet['!ref'])[1];
+      
       if (lastColNum == 'AG') {
         options.range =  1;
         options.header =  ['name','account','author','orderNum', 'originalFlag', 'videoCount', 'title', 'url', 'summary', 'content', 'clicksCount','likeCount', 'rewardCount', 'commentCount', 'commentLikeCount', 'commentReplyCount', 'commentReplyLikeCount', 'imageUrl', 'sourceUrl', 'videoUrl', 'musicUrl', 'audioUrl', 'memo', 'publicTime', 'updateTime'];
 
-      } else if (lastColNum == 'AB') {
+      } else if (lastColNum == 'AE') {
         options.range = 1;
+        options.header =  ['name','account','author','orderNum', 'originalFlag', 'videoCount', 'title', 'url', 'summary', 'content', 'clicksCount','likeCount', 'rewardCount', 'commentCount', 'commentLikeCount', 'imageUrl', 'sourceUrl', 'videoUrl', 'musicUrl', 'audioUrl', 'memo', 'publicTime', 'updateTime'];
+
+      } else if (lastColNum == 'AB') {
         options.header = ['name', 'account', 'type', 'author', 'orderNum', 'originalFlag', 'title', 'url', 'summary', 'content', 'clicksCount', 'likeCount', 'imageUrl', 'sourceUrl', 'videoUrl', 'musicUrl', 'audioUrl', 'publicTime', 'updateTime'];
+        options.range = 1;
+        
+      } else if (lastColNum != 'Y') {
+        this.pushLog('字段无法解析，请使用未经调整的原始文件', true);
+        return;
       }
       
       const rows = XLSX.utils.sheet_to_json(firstSheet, options);
       const dates = rows.map(row => Date.parse(row.publicTime));
-      this.startDate = new Date(dates.sort()[0]).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'});
-      this.endDate = new Date(dates.sort()[dates.length - 1]).toLocaleDateString('zh-CN', {timeZone: 'Asia/Shanghai'});
+      this.startDate = new Date(dates.sort()[0]).toJSON().slice(0, 10);
+      this.endDate = new Date(dates.sort()[dates.length - 1]).toJSON().slice(0, 10);
       this.statistics =  this.assembleData(rows);
       this.pushLog('数据提取成功，请确认下方的开始日期和结束日期是否准确，不准确可以手动修改');
       this.disableCalculate = false;
@@ -139,22 +153,27 @@ export default {
     changeEndDate (value) {
       this.endDate = value;
     },
-    checkDate (start, end) {
-      const startDate = new Date(start);
-      const endDate = new Date(end);
+    checkDate () {
+      console.log(this.startDate, this.endDate);
+      const re = /\d{4}-\d{2}-\d{2}/;
       
-      if (startDate == 'Invalid Date' || endDate == 'Invalid Date' ) {
-        this.pushLog('输入的日期格式不准确，请按照“年/月/日”输入，如 2019/1/1', true);
+      if (!(re.test(this.startDate) && re.test(this.endDate))) {
+        this.pushLog('输入的日期格式不准确，请按照“yyyy-mm-dd”输入，如 2019-01-01，月和日不足两位时需要用 0 补齐', true);
         return false;
-      } else if (startDate > endDate) {
-        this.pushLog('开始日期不能大于结束日期', true);
-        return false
-      } else {
-        return true;
       }
+
+      const startDate = new Date(this.startDate);
+      const endDate = new Date(this.endDate);
+
+      if (startDate > endDate) {
+        this.pushLog('开始日期不能大于结束日期', true);
+        return false;
+      }
+
+      return true;
     },
     handleCalculate () {
-      if (this.checkDate(this.startDate, this.endDate)) {
+      if (this.checkDate()) {
         this.pushLog('开始计算...');
         const n = (Date.parse(this.endDate) - Date.parse(this.startDate)) / 86400000 + 1;
         this.pushLog(`时间周期为 ${this.startDate} ~ ${this.endDate}，共 ${n} 天`);
@@ -167,17 +186,17 @@ export default {
           const rM = 100000;
           const rA = 100000;
           const rH = n * 100000;
-          const lS = n * 800000;
+          const lS = n * 80000;
 
           // 标准化得分
-          const rSI = Math.log(gh.readSum + 1) / Math.log(rS + 1) * 1000;
-          const rMI = Math.log(gh.readMax + 1) / Math.log(rM + 1) * 1000;
-          const rAI = Math.log(gh.readAvg + 1) / Math.log(rA + 1) * 1000;
-          const rHI = Math.log(gh.readSumOfHeadline + 1) / Math.log(rH + 1) * 1000;
-          const lSI = Math.log(gh.likeSum + 1) / Math.log(lS + 1) * 1000;
+          const rSI = (Math.log(gh.readSum + 1) / Math.log(rS + 1)) * 1000;
+          const rMI = (Math.log(gh.readMax + 1) / Math.log(rM + 1)) * 1000;
+          const rAI = (Math.log(gh.readAvg + 1) / Math.log(rA + 1)) * 1000;
+          const rHI = (Math.log(gh.readSumOfHeadline + 1) / Math.log(rH + 1)) * 1000;
+          const lSI = (Math.log(gh.likeSum + 1) / Math.log(lS + 1)) * 1000;
 
-          // 加权后相加，保留 1 位小数
-          const nri = (0.75 * rSI + 0.05 * rMI + 0.1 * rAI + 0.05 * rHI + 0.05 * lSI).toFixed(1);
+          // 加权后相加，保留 2 位小数
+          const nri = (0.75 * rSI + 0.05 * rMI + 0.1 * rAI + 0.05 * rHI + 0.05 * lSI).toFixed(2);
           return {
             account: gh.account,
             name: gh.name,

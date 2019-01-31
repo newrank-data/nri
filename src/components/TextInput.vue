@@ -1,7 +1,7 @@
 <template>
   <div>
     <span>{{label}}&nbsp;&nbsp;</span>
-    <input type="text" :value="value" @change="handleChange"/>
+    <input type="text" :value="value" @input="handleInput"/>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   name: 'TextInput',
   props: ['label', 'value'],
   methods: {
-    handleChange ($event) {
+    handleInput ($event) {
       this.$emit('change', $event.target.value);
     }
   }
