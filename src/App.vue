@@ -255,7 +255,7 @@ export default {
         const articleCount = data.articles.length;
 
         const readSum = data.articles.reduce((acc, article) => acc + article.clicksCount, 0);
-        const readMax = data.articles.sort((a, b) => b - a)[0].clicksCount;
+        const readMax = data.articles.sort((a, b) => b.clicksCount - a.clicksCount)[0].clicksCount;
         const readAvg = Math.round(readSum / articleCount);
         const readSumOfHeadline = data.articles.filter(article => article.orderNum == 0).reduce((acc, article) => acc + article.clicksCount, 0);
         const likeSum = data.articles.reduce((acc, article) => acc + article.likeCount, 0);
