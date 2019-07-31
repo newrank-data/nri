@@ -121,10 +121,11 @@ export default {
       // AB = 文章搜索
       // Y =  数据自助工具
       const lastColNum = /:([A-Z]+)/.exec(firstSheet['!ref'])[1];
+
       
       if (lastColNum == 'AG') {
         options.range =  1;
-        options.header =  ['name','account','author','orderNum', 'originalFlag', 'videoCount', 'title', 'url', 'summary', 'content', 'clicksCount','likeCount', 'rewardCount', 'commentCount', 'commentLikeCount', 'commentReplyCount', 'commentReplyLikeCount', 'imageUrl', 'sourceUrl', 'videoUrl', 'musicUrl', 'audioUrl', 'memo', 'publicTime', 'updateTime'];
+        options.header =  ['name','account','author','orderNum', 'originalFlag', 'videoCount', 'publicTime', 'title', 'url', 'summary', 'content', 'clicksCount','likeCount', 'rewardCount', 'commentCount', 'commentLikeCount', 'commentReplyCount', 'commentReplyLikeCount', 'imageUrl', 'sourceUrl', 'videoUrl', 'musicUrl', 'audioUrl', 'memo', 'updateTime'];
 
       } else if (lastColNum == 'AE') {
         options.range = 1;
@@ -154,7 +155,6 @@ export default {
       this.endDate = value;
     },
     checkDate () {
-      console.log(this.startDate, this.endDate);
       const re = /\d{4}-\d{2}-\d{2}/;
       
       if (!(re.test(this.startDate) && re.test(this.endDate))) {
